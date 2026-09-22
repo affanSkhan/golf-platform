@@ -130,3 +130,37 @@ create policy "draw results admin update" on public.draw_results for update usin
 create policy "draw results admin delete" on public.draw_results for delete using (public.is_admin());
 create policy "audit own insert" on public.audit_logs for insert with check (actor_id=auth.uid() or public.is_admin());
 create policy "audit admin read" on public.audit_logs for select using (public.is_admin());
+
+alter table public.charities add column if not exists slug text unique;
+alter table public.charities add column if not exists events jsonb not null default '[]'::jsonb;
+alter table public.draws add column if not exists drawn_numbers integer[] not null default '{}';
+alter table public.draws add column if not exists pool_five numeric(12,2) not null default 0;
+alter table public.draws add column if not exists pool_four numeric(12,2) not null default 0;
+alter table public.draws add column if not exists pool_three numeric(12,2) not null default 0;
+alter table public.draw_results add column if not exists ticket integer[] not null default '{}';
+alter table public.draw_results add column if not exists proof_reviewed_at timestamptz;
+alter table public.draw_results add column if not exists admin_notes text;
+alter table public.golf_scores drop constraint if exists golf_scores_user_id_score_date_key;
+alter table public.golf_scores add constraint golf_scores_user_id_score_date_key unique(user_id,score_date);
+create unique index if not exists draw_results_draw_user_idx on public.draw_results(draw_id,user_id);
+
+drop trigger if exists golf_scores_keep_latest_five on public.golf_scores;
+create trigger golf_scores_keep_latest_five after insert or update of score_date on public.golf_scores for each row execute function public.trim_golf_scores();
+
+insert into public.charities (name,slug,description,featured,active,events) values
+('Open Fairways','open-fairways','Create meaningful access to sport for young people and first-time players.',true,true,'[{"title":"Community golf day","date":"2026-10-12","location":"London"}]'),
+('Green Ground','green-ground','Support local environmental restoration, green spaces and community-led projects.',true,true,'[{"title":"Fairway clean-up","date":"2026-10-18","location":"Manchester"}]'),
+('Community Lift','community-lift','Fund practical support for families and neighbourhoods that need a lift.',false,true,'[{"title":"Community support day","date":"2026-10-21","location":"Birmingham"}]'),
+('Next Generation Sport','next-generation-sport','Equipment, coaching and participation support for young athletes.',false,true,'[]'),
+('Fair Start Foundation','fair-start-foundation','Help remove cost barriers that keep people from finding their community through sport.',false,true,'[]'),
+('Better Neighbourhoods','better-neighbourhoods','Back local projects that improve shared spaces and create stronger communities.',false,true,'[]')
+on conflict (slug) do nothing;
+
+insert into storage.buckets (id,name,public) values ('winner-proofs','winner-proofs',false) on conflict (id) do nothing;
+
+drop policy if exists "winner proofs own upload" on storage.objects;
+create policy "winner proofs own upload" on storage.objects for insert to authenticated with check (bucket_id='winner-proofs' and (storage.foldername(name))[1]=auth.uid()::text);
+drop policy if exists "winner proofs own read" on storage.objects;
+create policy "winner proofs own read" on storage.objects for select to authenticated using (bucket_id='winner-proofs' and ((storage.foldername(name))[1]=auth.uid()::text or public.is_admin()));
+drop policy if exists "winner proofs admin delete" on storage.objects;
+create policy "winner proofs admin delete" on storage.objects for delete to authenticated using (bucket_id='winner-proofs' and public.is_admin());
