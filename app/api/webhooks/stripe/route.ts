@@ -12,13 +12,13 @@ export async function POST(req:Request){
    }
    if(event.type==="customer.subscription.created"||event.type==="customer.subscription.updated"){
      const subscription=event.data.object as Stripe.Subscription;const status=subscription.status==="active"||subscription.status==="trialing"?"active":"inactive";
-     await supabase.from("subscriptions").update({status,renewal_date:renewalDate(subscription.current_period_end)}).eq("stripe_subscription_id",subscription.id)
+     await supabase.from("subscriptions").update({status,renewal_date:renewalDate((subscription as unknown as {current_period_end?:number}).current_period_end)}).eq("stripe_subscription_id",subscription.id)
    }
    if(event.type==="customer.subscription.deleted"){
      const subscription=event.data.object as Stripe.Subscription;await supabase.from("subscriptions").update({status:"inactive",renewal_date:null}).eq("stripe_subscription_id",subscription.id)
    }
    if(event.type==="invoice.paid"){
-     const invoice=event.data.object as Stripe.Invoice;const subscriptionId=typeof invoice.subscription==="string"?invoice.subscription:null;if(subscriptionId)await supabase.from("subscriptions").update({status:"active"}).eq("stripe_subscription_id",subscriptionId)
+     const invoice=event.data.object as Stripe.Invoice;const invoiceData=invoice as unknown as {subscription?:string|Stripe.Subscription|null};const subscriptionId=typeof invoiceData.subscription==="string"?invoiceData.subscription:null;if(subscriptionId)await supabase.from("subscriptions").update({status:"active"}).eq("stripe_subscription_id",subscriptionId)
    }
  }catch(e){return NextResponse.json({error:e instanceof Error?e.message:"webhook_processing_failed"},{status:500})}
  return NextResponse.json({received:true})
