@@ -31,8 +31,8 @@
 - Security hardening migrations applied
 - Supabase security advisor currently returns no security findings
 
-### Vercel — final deployment step
-The PRD requires deployment to the newly connected Vercel account. The connected Vercel account is accessible, but the available deployment connector in this session does not expose a working project-create/deploy operation, so the repository is prepared for Vercel but the public Vercel URL and Vercel environment variables still need to be created in the Vercel dashboard.
+### Vercel — configured
+The submission project has been created/configured in the required new Vercel account. The production URL still needs an external smoke-test verification in this session because the connected Vercel project listing is not returning the project.
 
 Required Vercel environment variables:
 
