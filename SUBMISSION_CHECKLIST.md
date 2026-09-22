@@ -4,7 +4,7 @@
 
 - Public, impact-first responsive website
 - Monthly/yearly membership presentation and Stripe Checkout integration
-- Supabase-ready authentication and role boundaries
+- Supabase authentication and role boundaries
 - Stableford score validation (1–45)
 - One score per date with edit/delete
 - Latest-five rolling score rule
@@ -21,17 +21,32 @@
 - GitHub Actions test + build verification
 - Responsive, motion-enhanced UI aligned with the PRD
 
+## Infrastructure status
+
+### Supabase — configured
+- New Supabase project: `digital-heroes-golf-platform`
+- Region: `ap-south-1`
+- Project ref: `pgvopyvtumjzljqhsngl`
+- Full initial schema, RLS, storage bucket and charity seed data applied
+- Security hardening migrations applied
+- Supabase security advisor currently returns no security findings
+
+### Vercel — final deployment step
+The PRD requires deployment to the newly connected Vercel account. The connected Vercel account is accessible, but the available deployment connector in this session does not expose a working project-create/deploy operation, so the repository is prepared for Vercel but the public Vercel URL and Vercel environment variables still need to be created in the Vercel dashboard.
+
+Required Vercel environment variables:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_MONTHLY_PRICE_ID`
+- `STRIPE_YEARLY_PRICE_ID`
+- `NEXT_PUBLIC_APP_URL`
+
 ## Current live staging
 
 https://digital-heroes-golf-platform-8l0d.onrender.com
-
-## Strict submission infrastructure still required
-
-The PRD requires a **new Supabase project** and a **new Vercel account** with production environment variables. The codebase is prepared for those services, but credentials/account resources must be connected before the submission can honestly be described as fully production-backed.
-
-The current connected Supabase organization has two active free projects, so creation of the required new project is blocked by the account's free-project limit. Do not pause an existing project without deciding which existing application may be taken offline.
-
-The current deployment toolchain has a working Render deployment, while the available Vercel connection is read-only for deployment in this session. The live Render URL is kept as a staging fallback.
 
 ## Test checklist
 
