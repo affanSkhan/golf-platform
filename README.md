@@ -24,8 +24,9 @@ Production-oriented implementation of the Digital Heroes 2026 Level 1 PRD: a sub
 - CI build verification
 
 ## Deployment
-Verified staging deployment: https://digital-heroes-golf-platform-8l0d.onrender.com
-Render auto-deploy is enabled from main.
+- Submission staging: https://digital-heroes-golf-platform-8l0d.onrender.com
+- Vercel production project: configured in the required new Vercel account
+- Supabase production project: `digital-heroes-golf-platform` (`pgvopyvtumjzljqhsngl`, `ap-south-1`)
 
-## Production infrastructure
-The PRD specifies a new Supabase project and a new Vercel account. The application is structured for both. Live authentication, persistent database storage and Stripe subscription processing require those project credentials to be connected.
+## Production environment
+Required variables are documented in `.env.example` and must be configured in Vercel for the production build. Supabase auth/database/storage are ready; Stripe checkout/webhook functionality requires valid Stripe test/live credentials.
