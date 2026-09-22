@@ -63,35 +63,39 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative min-h-[510px] lg:min-h-[610px]">
+            <div className="relative min-h-[530px] lg:min-h-[620px]">
               <div className="absolute right-8 top-3 size-56 rounded-full bg-[#d9e5dc]/80 blur-3xl md:size-72" />
-              <div className="absolute left-0 top-16 h-[440px] w-full max-w-xl overflow-hidden rounded-[2.25rem] border border-white/60 bg-[#172823] p-5 text-white soft-shadow md:h-[530px] md:p-7">
-                <div className="absolute inset-0 opacity-80 impact-orb" />
+              <div className="hero-stage soft-shadow absolute left-0 top-8 h-[470px] w-full max-w-xl rounded-[2.25rem] border border-white/10 p-5 text-white md:h-[555px] md:p-7">
                 <div className="relative flex h-full flex-col justify-between">
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-[10px] uppercase tracking-[.28em] text-white/50">Member impact</div>
-                      <div className="mt-2 text-sm text-white/75">Your membership, in motion.</div>
+                      <div className="text-[10px] uppercase tracking-[.28em] text-white/45">Member impact</div>
+                      <div className="mt-2 text-sm text-white/72">Performance in motion.</div>
                     </div>
-                    <div className="rounded-full border border-white/15 bg-white/10 p-2"><HeartHandshake size={17} /></div>
+                    <div className="rounded-full border border-white/12 bg-white/10 p-2 backdrop-blur"><HeartHandshake size={17} /></div>
                   </div>
-                  <div className="mx-auto grid place-items-center">
-                    <div className="float-slow relative grid size-56 place-items-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md md:size-64">
-                      <div className="absolute inset-4 rounded-full border border-white/10" />
-                      <div className="absolute inset-9 rounded-full border border-white/10" />
-                      <div className="text-center">
-                        <div className="text-6xl font-semibold tracking-[-.04em]">10<span className="text-3xl">%</span></div>
-                        <div className="mt-2 max-w-[140px] text-xs leading-5 text-white/65">minimum share directed to the cause you choose</div>
+
+                  <div className="relative mx-auto grid size-[280px] place-items-center md:size-[330px]">
+                    <div className="hero-orbit orbit-spin" />
+                    <div className="absolute inset-[15%] rounded-full border border-white/8" />
+                    <div className="absolute inset-[23%] rounded-full border border-white/7 bg-white/[.025] backdrop-blur-sm" />
+                    <div className="hero-ball size-40 md:size-48">
+                      <div className="relative z-10 text-center text-[#12201d]">
+                        <div className="text-[10px] font-semibold uppercase tracking-[.2em] text-black/35">Impact score</div>
+                        <div className="mt-1 text-4xl font-semibold tracking-[-.04em] md:text-5xl">10<span className="text-xl">%</span></div>
+                        <div className="mt-1 text-[10px] uppercase tracking-[.14em] text-black/40">minimum to a cause</div>
                       </div>
                     </div>
+                    <div className="shimmer-line absolute left-1/2 top-1/2 h-px w-[88%] -translate-x-1/2 bg-white/10" />
                   </div>
+
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       ["5", "scores"],
                       ["40%", "jackpot"],
                       ["1×", "monthly"],
-                    ].map(([value, label]) => (
-                      <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                    ].map(([value, label], index) => (
+                      <div key={label} className={"rounded-2xl border border-white/10 bg-white/8 p-3 backdrop-blur-sm " + (index === 1 ? "shimmer-line" : "")}>
                         <div className="text-lg font-semibold">{value}</div>
                         <div className="text-[10px] uppercase tracking-[.15em] text-white/50">{label}</div>
                       </div>
@@ -99,14 +103,20 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
               <div className="pulse-soft absolute -bottom-2 right-0 w-52 rounded-3xl border border-black/8 bg-white p-5 soft-shadow-sm md:right-[-10px] md:w-60">
                 <div className="flex items-center justify-between">
                   <div className="text-[10px] font-semibold uppercase tracking-[.2em] text-black/45">This month</div>
                   <Trophy size={16} className="text-[#d58f58]" />
                 </div>
                 <div className="mt-4 flex items-end gap-1"><span className="text-4xl font-semibold tracking-tight">40%</span><span className="pb-1 text-xs text-black/45">of the draw pool</span></div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/5"><div className="h-full w-[78%] rounded-full bg-[#567261]" /></div>
+                <div className="shimmer-line mt-3 h-2 overflow-hidden rounded-full bg-black/5"><div className="h-full w-[78%] rounded-full bg-[#567261]" /></div>
                 <div className="mt-2 flex justify-between text-[11px] text-black/45"><span>Jackpot</span><span>Rolls if unclaimed</span></div>
+              </div>
+
+              <div className="reveal-4 absolute left-0 top-20 hidden -translate-x-5 rounded-2xl border border-white/40 bg-white/75 px-4 py-3 text-black/70 shadow-xl backdrop-blur-md sm:block lg:-translate-x-10">
+                <div className="text-[9px] font-semibold uppercase tracking-[.2em] text-black/40">Latest round</div>
+                <div className="mt-1 text-sm font-semibold">33 · 31 · 28 · 26 · 24</div>
               </div>
             </div>
           </div>
@@ -132,8 +142,8 @@ export default function Home() {
             <Link href="/signup" className="mt-7 inline-flex items-center gap-2 text-sm font-medium underline decoration-black/20 underline-offset-4">Join the rhythm <ArrowUpRight size={15} /></Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {steps.map(([number, title, description]) => (
-              <article key={number} className="group rounded-[1.75rem] border border-black/7 bg-white/60 p-7 transition hover:-translate-y-1 hover:bg-white hover:soft-shadow-sm">
+            {steps.map(([number, title, description], index) => (
+              <article key={number} className={"group rounded-[1.75rem] border border-black/7 bg-white/60 p-7 transition hover:-translate-y-1 hover:bg-white hover:soft-shadow-sm " + (index === 0 ? "reveal" : index === 1 ? "reveal-2" : index === 2 ? "reveal-3" : "reveal-4")}>
                 <div className="flex items-center justify-between">
                   <div className="grid size-10 place-items-center rounded-full bg-[#d9e5dc] text-xs font-semibold text-[#40584b]">{number}</div>
                   <ArrowUpRight size={17} className="text-black/20 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black/60" />
@@ -188,7 +198,7 @@ export default function Home() {
               {tiers.map(([label, share, subtitle]) => (
                 <div key={label}>
                   <div className="mb-2 flex items-end justify-between gap-4"><div><div className="text-sm font-medium">{label}</div><div className="mt-1 text-xs text-white/40">{subtitle}</div></div><div className="text-2xl font-semibold">{share}</div></div>
-                  <div className="h-3 overflow-hidden rounded-full bg-white/8"><div className="h-full rounded-full bg-[#7e9a88]" style={{width: share}} /></div>
+                  <div className="shimmer-line h-3 overflow-hidden rounded-full bg-white/8"><div className="h-full rounded-full bg-[#7e9a88]" style={{width: share}} /></div>
                 </div>
               ))}
             </div>
