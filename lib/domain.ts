@@ -1,0 +1,1 @@
+export const DRAW_POOL={five:0.40,four:0.35,three:0.25} as const; export const MIN_CHARITY_PERCENT=10; export function validateStablefordScore(score:number){return Number.isInteger(score)&&score>=1&&score<=45} export function keepLatestFive<T extends {date:string}>(scores:T[]){return [...scores].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5)}
