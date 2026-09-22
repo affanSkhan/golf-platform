@@ -1,0 +1,6 @@
+export type DrawCandidate={userId:string;scores:number[]};export type DrawOutcome={userId:string;matchedNumbers:number;ticket:number[]};
+export function normalizedNumbers(scores:number[]){return scores.slice(0,5).map(s=>Math.max(1,Math.min(45,Math.round(s))))}
+export function deterministicTicket(userId:string,month:string){let h=2166136261;for(const c of userId+"|"+month){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}const out:number[]=[];for(let i=0;i<5;i++){h=Math.imul(h^i,16777619)>>>0;const n=(h%45)+1;if(!out.includes(n))out.push(n);else i--}return out.sort((a,b)=>a-b)}
+export function simulateDraw(candidates:DrawCandidate[],month:string){return candidates.map(c=>{const ticket=deterministicTicket(c.userId,month);const nums=normalizedNumbers(c.scores);const matched=ticket.filter(n=>nums.includes(n)).length;return {userId:c.userId,matchedNumbers:matched,ticket}}).filter(x=>x.matchedNumbers>=3).sort((a,b)=>b.matchedNumbers-a.matchedNumbers)}
+export function calculatePrizePools(subscriptionRevenue:number){const safe=Math.max(0,subscriptionRevenue);return {five:safe*.4,four:safe*.35,three:safe*.25}}
+export function splitPrize(pool:number,winners:number){return winners>0?Number((pool/winners).toFixed(2)):0}
