@@ -35,11 +35,17 @@ export default function Login(){
       return;
     }
 
-    const{data:profile}=await supabase
+    const{data:profile,error:profileError}=await supabase
       .from("profiles")
       .select("role")
       .eq("id",user.id)
       .maybeSingle();
+
+    if(profileError){
+      setLoading(false);
+      setError("Signed in, but your account role could not be loaded. Please try again.");
+      return;
+    }
 
     setLoading(false);
 
