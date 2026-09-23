@@ -1,3 +1,67 @@
 "use client";
-import {FormEvent,useState} from "react";import {useRouter} from "next/navigation";import {getSupabaseBrowser} from "../../lib/supabase/client";
-export default function Signup(){const[name,setName]=useState("");const[email,setEmail]=useState("");const[password,setPassword]=useState("");const[error,setError]=useState("");const[notice,setNotice]=useState("");const[loading,setLoading]=useState(false);const router=useRouter();async function submit(e:FormEvent){e.preventDefault();setError("");setNotice("");const supabase=getSupabaseBrowser();if(!supabase){setError("Authentication is not configured yet.");return}setLoading(true);const{data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name}}});setLoading(false);if(error){setError(error.message);return}if(data.session){router.push("/pricing");router.refresh()}else setNotice("Account created. Check your email to confirm your address, then sign in.")}return <main className="grid min-h-screen place-items-center bg-[#f4f0e7] p-6"><form onSubmit={submit} className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-sm"><a href="/" className="text-sm underline">← Home</a><h1 className="mt-10 text-3xl font-semibold">Play with purpose.</h1><input value={name} onChange={e=>setName(e.target.value)} className="mt-7 w-full rounded-xl border p-3" placeholder="Full name" required/><input value={email} onChange={e=>setEmail(e.target.value)} className="mt-4 w-full rounded-xl border p-3" placeholder="Email" type="email" required/><input value={password} onChange={e=>setPassword(e.target.value)} className="mt-4 w-full rounded-xl border p-3" placeholder="Password" type="password" minLength={8} required/>{error&&<div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}{notice&&<div className="mt-4 rounded-xl bg-[#dce5dc] p-3 text-sm">{notice}</div>}<button disabled={loading} className="mt-6 w-full rounded-xl bg-[#10211d] p-3 font-medium text-white disabled:opacity-50">{loading?"Creating…":"Create account"}</button><p className="mt-4 text-center text-sm text-black/55">Already a member? <a className="underline" href="/login">Sign in</a></p></form></main>}
+import {FormEvent,useState} from "react";
+import {useRouter} from "next/navigation";
+import {getSupabaseBrowser} from "../../lib/supabase/client";
+
+export default function Signup(){
+  const[name,setName]=useState("");
+  const[email,setEmail]=useState("");
+  const[password,setPassword]=useState("");
+  const[error,setError]=useState("");
+  const[notice,setNotice]=useState("");
+  const[loading,setLoading]=useState(false);
+  const router=useRouter();
+
+  async function submit(e:FormEvent){
+    e.preventDefault();
+    setError("");
+    setNotice("");
+
+    const supabase=getSupabaseBrowser();
+    if(!supabase){
+      setError("Authentication is not configured yet.");
+      return;
+    }
+
+    setLoading(true);
+
+    const redirectTo = `${window.location.origin}/auth/callback?next=/pricing`;
+
+    const{data,error}=await supabase.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{full_name:name},
+        emailRedirectTo:redirectTo
+      }
+    });
+
+    setLoading(false);
+
+    if(error){
+      setError(error.message);
+      return;
+    }
+
+    if(data.session){
+      router.push("/pricing");
+      router.refresh();
+    }else{
+      setNotice("Account created. Check your email to confirm your address. The verification link will return you to the live application.");
+    }
+  }
+
+  return <main className="grid min-h-screen place-items-center bg-[#f4f0e7] p-6">
+    <form onSubmit={submit} className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-sm">
+      <a href="/" className="text-sm underline">← Home</a>
+      <h1 className="mt-10 text-3xl font-semibold">Play with purpose.</h1>
+      <input value={name} onChange={e=>setName(e.target.value)} className="mt-7 w-full rounded-xl border p-3" placeholder="Full name" required/>
+      <input value={email} onChange={e=>setEmail(e.target.value)} className="mt-4 w-full rounded-xl border p-3" placeholder="Email" type="email" required/>
+      <input value={password} onChange={e=>setPassword(e.target.value)} className="mt-4 w-full rounded-xl border p-3" placeholder="Password" type="password" minLength={8} required/>
+      {error&&<div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+      {notice&&<div className="mt-4 rounded-xl bg-[#dce5dc] p-3 text-sm">{notice}</div>}
+      <button disabled={loading} className="mt-6 w-full rounded-xl bg-[#10211d] p-3 font-medium text-white disabled:opacity-50">{loading?"Creating…":"Create account"}</button>
+      <p className="mt-4 text-center text-sm text-black/55">Already a member? <a className="underline" href="/login">Sign in</a></p>
+    </form>
+  </main>
+}
