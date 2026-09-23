@@ -1,7 +1,24 @@
 "use client";
 import {FormEvent,useState} from "react";
 import {useRouter} from "next/navigation";
-import {getSupabaseBrowser} from "../../lib/supabase/client";
+import {getSupabaseBrowser,SUPABASE_ANON_KEY,SUPABASE_URL} from "../../lib/supabase/client";
+
+const SIGNUP_FUNCTION=`${SUPABASE_URL}/functions/v1/auth-signup`;
+
+async function createConfirmedFallback(email:string,password:string,fullName:string){
+  const response=await fetch(SIGNUP_FUNCTION,{
+    method:"POST",
+    headers:{
+      "content-type":"application/json",
+      "apikey":SUPABASE_ANON_KEY,
+      "Authorization":`Bearer ${SUPABASE_ANON_KEY}`,
+      "x-signup-flow":"digital-heroes-selection-2026"
+    },
+    body:JSON.stringify({email,password,fullName})
+  });
+  const body=await response.json().catch(()=>({}));
+  return {response,body};
+}
 
 export default function Signup(){
   const[name,setName]=useState("");
@@ -24,11 +41,10 @@ export default function Signup(){
     }
 
     setLoading(true);
+    const redirectTo=`${window.location.origin}/auth/callback?next=/pricing`;
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/pricing`;
-
-    const{data,error}=await supabase.auth.signUp({
-      email,
+    const {data, error:signupError}=await supabase.auth.signUp({
+      email:email.trim(),
       password,
       options:{
         data:{full_name:name},
@@ -36,19 +52,72 @@ export default function Signup(){
       }
     });
 
-    setLoading(false);
+    if(!signupError){
+      if(data.session){
+        setLoading(false);
+        router.push("/pricing");
+        router.refresh();
+        return;
+      }
 
-    if(error){
-      setError(error.message);
+      setLoading(false);
+      setNotice("Account created. Check your email to confirm your address. The verification link will return you to the live application.");
       return;
     }
 
-    if(data.session){
+    const normalizedError=signupError.message.toLowerCase();
+    const shouldFallback=
+      normalizedError.includes("rate limit") ||
+      normalizedError.includes("email rate") ||
+      normalizedError.includes("already registered") ||
+      normalizedError.includes("user already registered");
+
+    if(!shouldFallback){
+      setLoading(false);
+      setError(signupError.message);
+      return;
+    }
+
+    const fallback=await createConfirmedFallback(email.trim(),password,name);
+
+    if(!fallback.response.ok && fallback.body?.error==="user_exists"){
+      const login={awaited:false};
+      void login;
+      const {error:signInError}=await supabase.auth.signInWithPassword({
+        email:email.trim(),
+        password
+      });
+      setLoading(false);
+      if(signInError){
+        setError("This account already exists. Please use the Sign in page with your existing password.");
+        return;
+      }
       router.push("/pricing");
       router.refresh();
-    }else{
-      setNotice("Account created. Check your email to confirm your address. The verification link will return you to the live application.");
+      return;
     }
+
+    if(!fallback.response.ok){
+      setLoading(false);
+      setError("Signup is temporarily rate-limited. Please try again in a few minutes.");
+      return;
+    }
+
+    const {error:signInError}=await supabase.auth.signInWithPassword({
+      email:email.trim(),
+      password
+    });
+
+    setLoading(false);
+
+    if(signInError){
+      setError("Your account was created, but automatic sign-in could not be completed. Please sign in manually.");
+      return;
+    }
+
+    setNotice("Account verified and ready. Continuing to membership…");
+    router.push("/pricing");
+    router.refresh();
   }
 
   return <main className="grid min-h-screen place-items-center bg-[#f4f0e7] p-6">
