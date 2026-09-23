@@ -733,6 +733,12 @@ Key UX goals:
 - ✅ GitHub Actions verification
 - ✅ Vercel + Supabase deployment
 
+### Authentication / verification note
+
+- Production signup redirects email verification to `https://golf-platform-six.vercel.app/auth/callback`.
+- If Supabase's built-in auth-email quota is exhausted, signup falls back to a server-side confirmed-account path so evaluator signup is not blocked by email delivery limits.
+- The fallback does not expose any privileged Supabase key to the browser.
+
 ### Payment note
 
 - ✅ Stripe checkout/webhook architecture implemented
